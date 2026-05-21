@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DriveEase — Booking Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #0A0A0A;
+  --accent: #C8A96E;
+  --accent-light: #F5EDD8;
+  --accent-dark: #8B6F3E;
+  --surface: #FFFFFF;
+  --surface-2: #F8F7F5;
+  --surface-3: #F0EDE8;
+  --border: #E5E2DC;
+  --border-strong: #C8C4BC;
+  --text-primary: #0A0A0A;
+  --text-secondary: #6B6560;
+  --text-muted: #A09890;
+  --success: #2D6A4F;
+  --success-bg: #D8F3DC;
+  --warning: #7D4E00;
+  --warning-bg: #FFF3CD;
+  --danger: #7B1D1D;
+  --danger-bg: #FFE4E4;
+  --info: #1A4A7A;
+  --info-bg: #DBEAFE;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: var(--primary);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 56px;
+  border-bottom: 1px solid rgba(200,169,110,0.2);
+}
+.topbar-brand {
+  font-family: var(--font-display);
+  font-size: 1.2rem; font-weight: 700;
+  color: var(--accent); letter-spacing: -0.02em;
+}
+.topbar-brand span { color: #fff; }
+.btn-new-booking {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--accent); color: var(--primary);
+  border: none; border-radius: var(--radius-sm);
+  padding: 8px 16px; font-family: var(--font-body);
+  font-size: 0.8rem; font-weight: 500; cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.btn-new-booking:hover { background: #D4B87A; transform: translateY(-1px); }
+.btn-new-booking:active { transform: translateY(0); }
+
+/* ── MAIN LAYOUT ── */
+.main { padding-top: 56px; min-height: 100vh; }
+.container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+.container-wide { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+/* ── HERO SECTION ── */
+.hero {
+  background: var(--primary);
+  padding: 3rem 2rem 4rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(200,169,110,0.03) 40px, rgba(200,169,110,0.03) 41px);
+}
+.hero-eyebrow {
+  display: inline-block;
+  font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 0.75rem;
+  font-family: var(--font-display); font-weight: 600;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800;
+  color: #fff; line-height: 1.1; letter-spacing: -0.03em;
+  margin-bottom: 0.75rem;
+}
+.hero-title .accent { color: var(--accent); }
+.hero-sub {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.95rem; max-width: 420px; margin: 0 auto;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.card-header-icon {
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+  background: var(--accent-light); display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.card-header-title {
+  font-family: var(--font-display);
+  font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;
+}
+.card-header-sub { font-size: 0.8rem; color: var(--text-secondary); margin-top: 1px; }
+.card-body { padding: 1.5rem; }
+
+/* ── FORMS ── */
+.form-group { margin-bottom: 1.25rem; }
+.form-label {
+  display: block; font-size: 0.8rem; font-weight: 500;
+  color: var(--text-secondary); margin-bottom: 6px;
+  letter-spacing: 0.02em; text-transform: uppercase;
+}
+.form-input {
+  width: 100%; padding: 10px 14px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 0.95rem;
+  color: var(--text-primary); background: var(--surface);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.form-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(200,169,110,0.15);
+}
+.form-input.error { border-color: #E53E3E; }
+.form-error {
+  font-size: 0.78rem; color: #E53E3E;
+  margin-top: 5px; display: none; align-items: center; gap: 4px;
+}
+.form-error.visible { display: flex; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 22px; border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 0.9rem; font-weight: 500;
+  cursor: pointer; border: none; transition: all 0.2s; letter-spacing: 0.01em;
+}
+.btn-primary {
+  background: var(--primary); color: #fff;
+}
+.btn-primary:hover { background: #222; }
+.btn-accent { background: var(--accent); color: var(--primary); }
+.btn-accent:hover { background: #D4B87A; }
+.btn-outline {
+  background: transparent; color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+}
+.btn-outline:hover { background: var(--surface-3); }
+.btn-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid #FCA5A5; }
+.btn-success { background: var(--success-bg); color: var(--success); border: 1px solid #86EFAC; }
+.btn-full { width: 100%; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── STATUS BADGES ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 100px;
+  font-size: 0.72rem; font-weight: 500; letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.badge::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor; flex-shrink: 0;
+}
+.badge-confirmed { background: var(--info-bg); color: var(--info); }
+.badge-active { background: var(--success-bg); color: var(--success); }
+.badge-completed { background: var(--surface-3); color: var(--text-secondary); }
+.badge-cancelled { background: var(--danger-bg); color: var(--danger); }
+
+/* ── BOOKING DETAILS VIEW ── */
+.booking-detail-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+  background: var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.detail-cell {
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+}
+.detail-cell.full-width { grid-column: 1 / -1; }
+.detail-label {
+  font-size: 0.72rem; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  font-weight: 500; margin-bottom: 4px;
+}
+.detail-value {
+  font-size: 0.95rem; font-weight: 500; color: var(--text-primary);
+}
+@media (max-width: 600px) {
+  .booking-detail-grid { grid-template-columns: 1fr; }
+  .detail-cell.full-width { grid-column: 1; }
+}
+
+/* ── VEHICLE CARDS ── */
+.vehicle-cards-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.vehicle-card {
+  border: 2px solid var(--border); border-radius: var(--radius-md);
+  padding: 1.25rem; cursor: pointer; transition: all 0.2s;
+  background: var(--surface); position: relative;
+}
+.vehicle-card:hover:not(.unavailable) { border-color: var(--accent); box-shadow: var(--shadow-md); }
+.vehicle-card.selected { border-color: var(--accent); background: var(--accent-light); }
+.vehicle-card.unavailable { opacity: 0.5; cursor: not-allowed; background: var(--surface-3); }
+.vehicle-card-badge {
+  position: absolute; top: 10px; right: 10px;
+  font-size: 0.65rem; padding: 2px 8px; border-radius: 100px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.avail-badge { background: var(--success-bg); color: var(--success); }
+.unavail-badge { background: var(--danger-bg); color: var(--danger); }
+.vehicle-card-name { font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
+.vehicle-card-id { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 10px; }
+.vehicle-specs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.spec-pill {
+  font-size: 0.72rem; padding: 2px 8px; border-radius: 100px;
+  background: var(--surface-3); color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+/* ── CATEGORY PILLS ── */
+.category-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.75rem;
+}
+.category-card {
+  border: 2px solid var(--border); border-radius: var(--radius-md);
+  padding: 1rem; text-align: center; cursor: pointer;
+  transition: all 0.2s; background: var(--surface);
+}
+.category-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.category-card.selected { border-color: var(--accent); background: var(--accent-light); }
+.category-card-icon { font-size: 1.5rem; margin-bottom: 6px; }
+.category-card-name { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; }
+.category-card-rate { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; }
+
+/* ── EXTRAS ── */
+.extras-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+.extra-card {
+  border: 2px solid var(--border); border-radius: var(--radius-md);
+  padding: 1rem; cursor: pointer; transition: all 0.2s;
+  background: var(--surface); display: flex; align-items: center; gap: 10px;
+}
+.extra-card:hover { border-color: var(--accent); }
+.extra-card.selected { border-color: var(--accent); background: var(--accent-light); }
+.extra-check {
+  width: 18px; height: 18px; border-radius: 4px;
+  border: 2px solid var(--border-strong); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.extra-card.selected .extra-check {
+  background: var(--accent); border-color: var(--accent); color: var(--primary);
+}
+.extra-info {}
+.extra-name { font-size: 0.85rem; font-weight: 500; }
+.extra-price { font-size: 0.75rem; color: var(--text-secondary); }
+
+/* ── PRICING PANEL ── */
+.pricing-panel {
+  background: var(--primary); color: #fff;
+  border-radius: var(--radius-lg); padding: 1.5rem;
+  position: sticky; top: 72px;
+}
+.pricing-title {
+  font-family: var(--font-display); font-size: 0.9rem;
+  font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 1rem;
+}
+.pricing-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; font-size: 0.88rem; color: rgba(255,255,255,0.7);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.pricing-row:last-child { border-bottom: none; }
+.pricing-row.total {
+  color: #fff; font-weight: 600; font-size: 1rem; padding-top: 12px;
+  border-top: 1px solid rgba(200,169,110,0.3); border-bottom: none; margin-top: 4px;
+}
+.pricing-row.diff-positive { color: #86EFAC; }
+.pricing-row.diff-negative { color: #FCA5A5; }
+
+/* ── ALERT BOXES ── */
+.alert {
+  padding: 1rem 1.25rem; border-radius: var(--radius-md);
+  display: flex; gap: 10px; align-items: flex-start; margin-bottom: 1rem;
+  font-size: 0.88rem;
+}
+.alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.alert-content {}
+.alert-title { font-weight: 600; margin-bottom: 2px; }
+.alert-success { background: var(--success-bg); color: var(--success); border: 1px solid #86EFAC; }
+.alert-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid #FCD34D; }
+.alert-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid #FCA5A5; }
+.alert-info { background: var(--info-bg); color: var(--info); border: 1px solid #93C5FD; }
+.alert-escalate { background: #FDF4FF; color: #6B21A8; border: 1px solid #D8B4FE; }
+
+/* ── STEPS ── */
+.step-indicator {
+  display: flex; align-items: center; gap: 0; margin-bottom: 2rem;
+  overflow-x: auto; padding-bottom: 4px;
+}
+.step {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.78rem; font-weight: 500; color: var(--text-muted);
+  white-space: nowrap;
+}
+.step-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--surface-3); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 600; flex-shrink: 0;
+}
+.step.active { color: var(--text-primary); }
+.step.active .step-num { background: var(--accent); border-color: var(--accent); color: var(--primary); }
+.step.done { color: var(--text-secondary); }
+.step.done .step-num { background: var(--success-bg); border-color: #86EFAC; color: var(--success); }
+.step-divider { width: 32px; height: 1px; background: var(--border); flex-shrink: 0; margin: 0 4px; }
+
+/* ── SECTION DIVIDERS ── */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em;
+  margin-bottom: 1rem; color: var(--text-primary);
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ── LOADING ── */
+.loading-overlay {
+  position: fixed; inset: 0; background: rgba(10,10,10,0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.loading-overlay.visible { opacity: 1; pointer-events: all; }
+.loading-box {
+  background: var(--surface); border-radius: var(--radius-xl);
+  padding: 2.5rem 2rem; text-align: center; min-width: 280px;
+  box-shadow: var(--shadow-lg);
+}
+.spinner {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-weight: 500; color: var(--text-secondary); font-size: 0.9rem; }
+
+/* ── TIMELINE (change summary) ── */
+.change-row {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.change-row:last-child { border-bottom: none; }
+.change-label { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; flex-shrink: 0; width: 100px; padding-top: 2px; }
+.change-from { font-size: 0.88rem; color: var(--text-secondary); text-decoration: line-through; }
+.change-arrow { color: var(--accent); font-size: 0.75rem; padding: 0 4px; }
+.change-to { font-size: 0.88rem; font-weight: 500; color: var(--text-primary); }
+
+/* ── RESULT SCREEN ── */
+.result-screen {
+  text-align: center; padding: 3rem 2rem;
+}
+.result-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; margin: 0 auto 1.5rem;
+}
+.result-icon.success { background: var(--success-bg); }
+.result-icon.danger { background: var(--danger-bg); }
+.result-icon.escalate { background: #FDF4FF; }
+.result-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; margin-bottom: 0.5rem; }
+.result-sub { color: var(--text-secondary); max-width: 440px; margin: 0 auto 2rem; line-height: 1.7; }
+
+/* ── NOTIFICATION TOAST ── */
+.toast-container {
+  position: fixed; top: 70px; right: 20px; z-index: 200;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  background: var(--primary); color: #fff;
+  padding: 12px 16px; border-radius: var(--radius-md);
+  font-size: 0.85rem; max-width: 300px;
+  border-left: 3px solid var(--accent);
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.3s ease;
+  display: flex; align-items: center; gap: 8px;
+}
+@keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ── SECTION VISIBILITY ── */
+.page-section { display: none; }
+.page-section.active { display: block; }
+
+/* ── MODIFICATION LAYOUT ── */
+.mod-layout {
+  display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 820px) { .mod-layout { grid-template-columns: 1fr; } }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+/* ── LOCATION SELECT ── */
+.location-option { display: flex; justify-content: space-between; align-items: center; }
+.location-unavail { font-size: 0.72rem; color: var(--danger); }
+
+select.form-input option[data-unavailable="true"] { color: #aaa; }
+
+/* ── MISC ── */
+.text-center { text-align: center; }
+.text-sm { font-size: 0.85rem; }
+.text-muted { color: var(--text-secondary); }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.gap-2 { gap: 1rem; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.flex-wrap { flex-wrap: wrap; }
+.font-bold { font-weight: 600; }
+.accent-text { color: var(--accent); }
+
+/* ── BLOCKED SCREEN ── */
+.blocked-banner {
+  background: linear-gradient(135deg, var(--danger-bg), #FFF5F5);
+  border: 2px solid #FCA5A5;
+  border-radius: var(--radius-lg);
+  padding: 2rem; text-align: center; margin-bottom: 1.5rem;
+}
+.blocked-banner-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.blocked-banner-title {
+  font-family: var(--font-display); font-size: 1.3rem; font-weight: 700;
+  color: var(--danger); margin-bottom: 0.5rem;
+}
+.blocked-banner-text { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem; }
+
+/* ── BOOKING SUMMARY MINI CARD ── */
+.booking-mini {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 1rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 8px;
+}
+.booking-mini-id {
+  font-family: var(--font-display); font-weight: 700; font-size: 1rem;
+  color: var(--accent);
+}
+.booking-mini-name { font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px; }
+
+/* ── RECEIPT ── */
+.receipt-actions {
+  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+}
+
+/* Smooth transitions */
+.fade-in { animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-brand">Drive<span>Ease</span></div>
+  <button class="btn-new-booking" onclick="startNewBooking()">
+    + New Booking
+  </button>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Processing your request...</div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ══════════════════════════════════════
+     SECTION 1: LOOKUP
+══════════════════════════════════════ -->
+<div id="section-lookup" class="page-section active">
+  <div class="hero">
+    <div class="hero-eyebrow">Booking Management</div>
+    <h1 class="hero-title">Modify Your <span class="accent">Reservation</span></h1>
+    <p class="hero-sub">Enter your booking details to view and manage your car rental reservation.</p>
+  </div>
+  <div class="container" style="max-width: 520px;">
+    <div class="card mt-3 fade-in">
+      <div class="card-header">
+        <div class="card-header-icon">🔑</div>
+        <div>
+          <div class="card-header-title">Verify Your Booking</div>
+          <div class="card-header-sub">All fields required for security</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Booking ID</label>
+          <input type="text" id="inputBookingId" class="form-input" placeholder="e.g. DRV-7829" />
+          <div class="form-error" id="err-bookingId">⚠ Please enter your booking ID</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="inputEmail" class="form-input" placeholder="name@example.com" />
+          <div class="form-error" id="err-email">⚠ Please enter a valid email address</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="inputPassword" class="form-input" placeholder="Minimum 6 characters" />
+          <div class="form-error" id="err-password">⚠ Please enter your password</div>
+        </div>
+        <button class="btn btn-primary btn-full mt-2" onclick="verifyBooking()">
+          Verify & View Booking →
+        </button>
+        <p class="text-center text-sm text-muted mt-2">Any valid 6+ character password is accepted for demo</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 2: BOOKING DETAILS
+══════════════════════════════════════ -->
+<div id="section-details" class="page-section">
+  <div class="container-wide">
+    <div class="mt-3 mb-2 flex items-center justify-between flex-wrap gap-2">
+      <div>
+        <p class="text-sm text-muted">Step 1 of 3 — Booking Found</p>
+        <h2 style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;letter-spacing:-0.02em;">Your Current Booking</h2>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-outline" onclick="goBack('lookup')">← Back to Lookup</button>
+        <button class="btn btn-accent" id="btnModifyBooking" onclick="goToModify()">Modify Booking →</button>
+      </div>
+    </div>
+
+    <div id="details-status-alert"></div>
+
+    <!-- Booking overview card -->
+    <div class="card fade-in mb-2">
+      <div class="card-header">
+        <div class="card-header-icon">📋</div>
+        <div>
+          <div class="card-header-title" id="details-booking-id">Booking #DRV-0000</div>
+          <div class="card-header-sub" id="details-booked-on">Booked on —</div>
+        </div>
+        <div style="margin-left:auto;" id="details-status-badge"></div>
+      </div>
+      <div class="card-body">
+        <div class="section-title">Customer Information</div>
+        <div class="booking-detail-grid mb-2">
+          <div class="detail-cell">
+            <div class="detail-label">Full Name</div>
+            <div class="detail-value" id="d-name">—</div>
+          </div>
+          <div class="detail-cell">
+            <div class="detail-label">Phone</div>
+            <div class="detail-value" id="d-phone">—</div>
+          </div>
+          <div class="detail-cell full-width">
+            <div class="detail-label">Email</div>
+            <div class="detail-value" id="d-email">—</div>
+          </div>
+        </div>
+
+        <div class="section-title">Vehicle</div>
+        <div class="booking-detail-grid mb-2">
+          <div class="detail-cell">
+            <div class="detail-label">Category</div>
+            <div class="detail-value" id="d-category">—</div>
+          </div>
+          <div class="detail-cell">
+            <div class="detail-label">Model</div>
+            <div class="detail-value" id="d-model">—</div>
+          </div>
+          <div class="detail-cell">
+            <div class="detail-label">Plate Number</div>
+            <div class="detail-value" id="d-plate">—</div>
+          </div>
+          <div class="detail-cell">
+            <div class="detail-label">Extras</div>
+            <div class="detail-value" id="d-extras">—</div>
+          </div>
+        </div>
+
+        <div class="section-title">Trip Details</div>
+        <div class="booking-detail-grid mb-2">
+          <div class="detail-cell">
+            <div class="detail-label">Pickup Date & Time</div>
+            <div class="detail-value" id="d-pickup-dt">—</div>
+          </div>
+          <div class="detail-cell">
+            <div class="detail-label">Dropoff Date & Time</div>
+            <div class="detail-value" id="d-dropoff-dt">—</div>
+          </div>
+          <div class="detail-cell">
+            <div class="detail-label">Pickup Location</div>
+            <div class="detail-value" id="d-pickup-loc">—</div>
+          </div>
+          <div class="detail-cell">
+            <div class="detail-label">Dropoff Location</div>
+            <div class="detail-value" id="d-dropoff-loc">—</div>
+          </div>
+          <div class="detail-cell full-width">
+            <div class="detail-label">Duration</div>
+            <div class="detail-value" id="d-duration">—</div>
+          </div>
+        </div>
+
+        <div class="section-title">Pricing</div>
+        <div class="booking-detail-grid">
+          <div class="detail-cell">
+            <div class="detail-label">Base Rate/Day</div>
+            <div class="detail-value" id="d-base-rate">—</div>
+          </div>
+          <div class="detail-cell">
+            <div class="detail-label">Extras/Day</div>
+            <div class="detail-value" id="d-extras-rate">—</div>
+          </div>
+          <div class="detail-cell full-width" style="background:var(--accent-light);">
+            <div class="detail-label">Total Price</div>
+            <div class="detail-value accent-text font-bold" id="d-total" style="font-size:1.2rem;">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Blocked message shown when modification is not allowed -->
+    <div id="blocked-section" style="display:none;">
+      <div class="blocked-banner fade-in">
+        <div class="blocked-banner-icon" id="blocked-icon">🚫</div>
+        <div class="blocked-banner-title" id="blocked-title">Modification Not Available</div>
+        <div class="blocked-banner-text" id="blocked-text">This booking cannot be modified.</div>
+        <button class="btn btn-accent" onclick="goToFinalReceipt(true)">
+          View Final Booking Details →
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 3: MODIFICATION FORM
+══════════════════════════════════════ -->
+<div id="section-modify" class="page-section">
+  <div class="container-wide">
+    <div class="mt-3 mb-2 flex items-center justify-between flex-wrap gap-2">
+      <div>
+        <p class="text-sm text-muted">Step 2 of 3 — Modify Booking</p>
+        <h2 style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;letter-spacing:-0.02em;">Modify Your Reservation</h2>
+      </div>
+      <button class="btn btn-outline" onclick="showSection('details')">← Back to Details</button>
+    </div>
+
+    <div class="booking-mini">
+      <div>
+        <div class="booking-mini-id" id="mod-booking-id">DRV-0000</div>
+        <div class="booking-mini-name" id="mod-customer-name">Customer</div>
+      </div>
+      <div id="mod-status-badge"></div>
+    </div>
+
+    <div id="escalate-notice" style="display:none;">
+      <div class="alert alert-escalate">
+        <div class="alert-icon">⚡</div>
+        <div>
+          <div class="alert-title">Active Booking — Support Escalation Required</div>
+          <div>Changes to active rentals are reviewed by our support team. Your request will be submitted for approval.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mod-layout">
+      <!-- Left: form -->
+      <div>
+        <!-- Customer Info -->
+        <div class="card mb-2 fade-in">
+          <div class="card-header">
+            <div class="card-header-icon">👤</div>
+            <div>
+              <div class="card-header-title">Customer Information</div>
+              <div class="card-header-sub">Edit personal details</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="mod-name" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" id="mod-phone" class="form-input" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" id="mod-email" class="form-input" />
+              <div class="form-error" id="err-mod-email">⚠ Please enter a valid email address</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip Details -->
+        <div class="card mb-2 fade-in">
+          <div class="card-header">
+            <div class="card-header-icon">📅</div>
+            <div>
+              <div class="card-header-title">Trip Details</div>
+              <div class="card-header-sub">Dates, times, and locations</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Pickup Date</label>
+                <input type="date" id="mod-pickup-date" class="form-input" onchange="updatePricing()" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Pickup Time</label>
+                <input type="time" id="mod-pickup-time" class="form-input" onchange="updatePricing()" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Dropoff Date</label>
+                <input type="date" id="mod-dropoff-date" class="form-input" onchange="updatePricing()" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Dropoff Time</label>
+                <input type="time" id="mod-dropoff-time" class="form-input" onchange="updatePricing()" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Pickup Location</label>
+                <select id="mod-pickup-loc" class="form-input" onchange="validateLocation('pickup')"></select>
+                <div class="form-error" id="err-pickup-loc">⚠ This location is currently unavailable</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Dropoff Location</label>
+                <select id="mod-dropoff-loc" class="form-input" onchange="validateLocation('dropoff')"></select>
+                <div class="form-error" id="err-dropoff-loc">⚠ This location is currently unavailable</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vehicle Category -->
+        <div class="card mb-2 fade-in">
+          <div class="card-header">
+            <div class="card-header-icon">🚗</div>
+            <div>
+              <div class="card-header-title">Vehicle Selection</div>
+              <div class="card-header-sub">Choose category then specific vehicle</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="section-title" style="font-size:0.85rem;">Vehicle Category</div>
+            <div class="category-grid" id="category-grid"></div>
+
+            <div id="vehicle-selection-section" style="display:none;margin-top:1.5rem;">
+              <div class="section-title" style="font-size:0.85rem;">Choose Your Vehicle</div>
+              <div class="vehicle-cards-grid" id="vehicle-cards-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Extras -->
+        <div class="card mb-2 fade-in">
+          <div class="card-header">
+            <div class="card-header-icon">⭐</div>
+            <div>
+              <div class="card-header-title">Extras & Add-ons</div>
+              <div class="card-header-sub">Enhance your rental experience</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="extras-grid" id="extras-grid"></div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="card mb-2 fade-in">
+          <div class="card-body">
+            <div id="mod-fee-notice" class="alert" style="display:none;margin-bottom:1rem;"></div>
+            <button class="btn btn-primary btn-full" style="font-size:1rem;padding:14px;" onclick="submitModification()">
+              Submit Modification Request →
+            </button>
+            <p class="text-center text-sm text-muted mt-2">Review changes before final confirmation</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: pricing panel -->
+      <div>
+        <div class="pricing-panel fade-in">
+          <div class="pricing-title">💰 Live Pricing</div>
+          <div class="pricing-row">
+            <span>Original Total</span>
+            <span id="pr-original">$0.00</span>
+          </div>
+          <div class="pricing-row">
+            <span id="pr-base-label">Base Rate</span>
+            <span id="pr-base">$0.00</span>
+          </div>
+          <div class="pricing-row">
+            <span id="pr-days-label">Duration</span>
+            <span id="pr-days">0 days</span>
+          </div>
+          <div class="pricing-row">
+            <span>Extras/Day</span>
+            <span id="pr-extras">$0.00</span>
+          </div>
+          <div class="pricing-row">
+            <span>Modification Fee</span>
+            <span id="pr-modfee">$0.00</span>
+          </div>
+          <div class="pricing-row total">
+            <span>New Total</span>
+            <span id="pr-total">$0.00</span>
+          </div>
+          <div class="pricing-row" id="pr-diff-row" style="margin-top:8px;padding-top:8px;">
+            <span id="pr-diff-label">Difference</span>
+            <span id="pr-diff">$0.00</span>
+          </div>
+        </div>
+
+        <div class="card mt-2 fade-in" id="change-summary-card" style="display:none;">
+          <div class="card-header" style="padding:1rem 1.25rem;">
+            <div class="card-header-title" style="font-size:0.85rem;">📝 Changes Summary</div>
+          </div>
+          <div class="card-body" style="padding:0.75rem 1.25rem;" id="change-summary-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 4: RESULT / RECEIPT
+══════════════════════════════════════ -->
+<div id="section-result" class="page-section">
+  <div class="container" style="max-width:640px;">
+    <div class="card mt-3 fade-in" id="result-card">
+      <!-- filled dynamically -->
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ══════════════════════════════════════
+// DATA DEFINITIONS
+// ══════════════════════════════════════
+
+const LOCATIONS = [
+  { id: 'downtown', name: 'Downtown Central', available: true },
+  { id: 'airport', name: 'International Airport', available: true },
+  { id: 'northside', name: 'Northside Hub', available: true },
+  { id: 'westfield', name: 'Westfield Mall', available: true },
+  { id: 'harbor', name: 'Harbor View Terminal', available: false },
+  { id: 'eastpark', name: 'East Park Station', available: true },
+  { id: 'southgate', name: 'Southgate Center', available: true },
+  { id: 'university', name: 'University District', available: false },
+];
+
+const EXTRAS = [
+  { id: 'gps', name: 'GPS Navigation', price: 5, icon: '🗺️' },
+  { id: 'child_seat', name: 'Child Seat', price: 8, icon: '👶' },
+  { id: 'insurance', name: 'Full Insurance', price: 15, icon: '🛡️' },
+  { id: 'wifi', name: 'In-Car WiFi', price: 7, icon: '📶' },
+  { id: 'roadside', name: 'Roadside Assistance', price: 6, icon: '🔧' },
+  { id: 'add_driver', name: 'Additional Driver', price: 10, icon: '👥' },
+];
+
+const CATEGORIES = {
+  economy:  { label: 'Economy',  icon: '🚙', rate: 35 },
+  compact:  { label: 'Compact',  icon: '🚗', rate: 45 },
+  midsize:  { label: 'Midsize',  icon: '🚘', rate: 60 },
+  suv:      { label: 'SUV',      icon: '🚐', rate: 80 },
+  luxury:   { label: 'Luxury',   icon: '🏎️', rate: 120 },
+  minivan:  { label: 'Minivan',  icon: '🚌', rate: 70 },
+};
+
+const VEHICLES = {
+  economy: [
+    { id:'ECO-101', model:'Toyota Yaris', trans:'Automatic', fuel:'Petrol', seats:5, color:'White', available:true },
+    { id:'ECO-102', model:'Hyundai i10', trans:'Manual', fuel:'Petrol', seats:5, color:'Silver', available:true },
+    { id:'ECO-103', model:'Kia Picanto', trans:'Automatic', fuel:'Petrol', seats:5, color:'Blue', available:false },
+    { id:'ECO-104', model:'Suzuki Swift', trans:'Manual', fuel:'Petrol', seats:5, color:'Red', available:true },
+  ],
+  compact: [
+    { id:'COM-201', model:'VW Golf', trans:'Automatic', fuel:'Petrol', seats:5, color:'Black', available:true },
+    { id:'COM-202', model:'Honda Civic', trans:'Automatic', fuel:'Hybrid', seats:5, color:'Grey', available:true },
+    { id:'COM-203', model:'Toyota Corolla', trans:'Automatic', fuel:'Hybrid', seats:5, color:'White', available:false },
+    { id:'COM-204', model:'Mazda 3', trans:'Manual', fuel:'Petrol', seats:5, color:'Deep Red', available:true },
+  ],
+  midsize: [
+    { id:'MID-301', model:'Toyota Camry', trans:'Automatic', fuel:'Hybrid', seats:5, color:'Champagne', available:true },
+    { id:'MID-302', model:'Honda Accord', trans:'Automatic', fuel:'Petrol', seats:5, color:'Black', available:true },
+    { id:'MID-303', model:'Nissan Altima', trans:'Automatic', fuel:'Petrol', seats:5, color:'Silver', available:false },
+    { id:'MID-304', model:'Subaru Outback', trans:'Automatic', fuel:'Petrol', seats:5, color:'Green', available:true },
+  ],
+  suv: [
+    { id:'SUV-401', model:'Toyota RAV4', trans:'Automatic', fuel:'Hybrid', seats:5, color:'Pearl White', available:true },
+    { id:'SUV-402', model:'Ford Explorer', trans:'Automatic', fuel:'Petrol', seats:7, color:'Navy', available:false },
+    { id:'SUV-403', model:'Honda CR-V', trans:'Automatic', fuel:'Hybrid', seats:5, color:'Platinum', available:true },
+    { id:'SUV-404', model:'Hyundai Tucson', trans:'Automatic', fuel:'Diesel', seats:5, color:'Dark Red', available:true },
+  ],
+  luxury: [
+    { id:'LUX-501', model:'BMW 5 Series', trans:'Automatic', fuel:'Petrol', seats:5, color:'Alpine White', available:true },
+    { id:'LUX-502', model:'Mercedes E-Class', trans:'Automatic', fuel:'Petrol', seats:5, color:'Obsidian Black', available:false },
+    { id:'LUX-503', model:'Audi A6', trans:'Automatic', fuel:'Diesel', seats:5, color:'Phantom Grey', available:true },
+    { id:'LUX-504', model:'Lexus ES 350', trans:'Automatic', fuel:'Hybrid', seats:5, color:'Sonic Quartz', available:true },
+  ],
+  minivan: [
+    { id:'VAN-601', model:'Toyota Sienna', trans:'Automatic', fuel:'Hybrid', seats:8, color:'Blizzard Pearl', available:true },
+    { id:'VAN-602', model:'Chrysler Pacifica', trans:'Automatic', fuel:'Hybrid', seats:7, color:'Bright White', available:false },
+    { id:'VAN-603', model:'Kia Carnival', trans:'Automatic', fuel:'Petrol', seats:8, color:'Aurora Black', available:true },
+    { id:'VAN-604', model:'Honda Odyssey', trans:'Automatic', fuel:'Petrol', seats:8, color:'Silver', available:true },
+  ],
+};
+
+const FIRST_NAMES = ['James','Sarah','Michael','Emily','David','Jessica','Robert','Amanda','William','Ashley','Daniel','Brittany','Matthew','Megan','Anthony','Samantha','Mark','Nicole','Donald','Stephanie'];
+const LAST_NAMES  = ['Smith','Johnson','Williams','Brown','Jones','Miller','Davis','Wilson','Moore','Taylor','Anderson','Thomas','Jackson','White','Harris','Martin','Thompson','Garcia','Martinez','Robinson'];
+const PHONES = ['+1 555-0127','+1 555-0234','+1 555-0378','+1 555-0491','+1 555-0512','+1 555-0633'];
+
+// ══════════════════════════════════════
+// DETERMINISTIC BOOKING GENERATOR
+// ══════════════════════════════════════
+function hashStr(s) {
+  let h = 0;
+  for(let i=0;i<s.length;i++) h = (Math.imul(31,h)+s.charCodeAt(i))|0;
+  return Math.abs(h);
+}
+
+function pick(arr, seed) { return arr[seed % arr.length]; }
+
+function generateBooking(bookingId, email) {
+  const seed = hashStr(bookingId + email);
+  const catKeys = Object.keys(CATEGORIES);
+  const catKey = pick(catKeys, seed);
+  const cat = CATEGORIES[catKey];
+  const vehicles = VEHICLES[catKey];
+  const vehicleIdx = (seed >> 3) % vehicles.length;
+  const vehicle = vehicles[vehicleIdx];
+
+  const firstName = pick(FIRST_NAMES, seed >> 1);
+  const lastName  = pick(LAST_NAMES,  seed >> 2);
+  const phone     = pick(PHONES,      seed >> 4);
+
+  // Generate pickup date: 1-30 days from now, varied
+  const now = new Date();
+  const daysOffset = (seed % 30) - 5; // -5 to +24 days from now
+  const pickupDate = new Date(now);
+  pickupDate.setDate(now.getDate() + daysOffset);
+  pickupDate.setHours(8 + (seed % 10), (seed % 2 === 0 ? 0 : 30), 0, 0);
+
+  const rentalDays = 1 + (seed % 7);
+  const dropoffDate = new Date(pickupDate);
+  dropoffDate.setDate(pickupDate.getDate() + rentalDays);
+  dropoffDate.setHours(10 + (seed % 8), 0, 0, 0);
+
+  // extras
+  const availExtras = EXTRAS.filter((_,i) => (seed >> (i+4)) % 3 === 0);
+  const extrasPerDay = availExtras.reduce((s,e)=>s+e.price, 0);
+
+  // locations
+  const availLocs = LOCATIONS.filter(l=>l.available);
+  const pickupLoc = pick(availLocs, seed >> 6);
+  const dropoffLoc = pick(availLocs, (seed >> 8) + 2);
+
+  const totalDays = Math.max(1, Math.round((dropoffDate - pickupDate) / 86400000));
+  const baseRate = cat.rate;
+  const totalPrice = (baseRate + extrasPerDay) * totalDays;
+
+  // plate
+  const plates = ['ABC-1234','XYZ-5678','DEF-9012','GHI-3456','JKL-7890','MNO-2345'];
+  const plate = pick(plates, seed >> 10);
+
+  // status: vary by seed
+  const statuses = ['confirmed','confirmed','confirmed','active','completed','cancelled'];
+  const status = pick(statuses, seed >> 12);
+
+  // booked on date: 1-30 days before pickup
+  const bookedOn = new Date(pickupDate);
+  bookedOn.setDate(pickupDate.getDate() - (5 + seed%20));
+
+  return {
+    bookingId: bookingId.toUpperCase(),
+    email,
+    customerName: `${firstName} ${lastName}`,
+    phone,
+    pickupDate, dropoffDate,
+    pickupLoc, dropoffLoc,
+    category: catKey, categoryLabel: cat.label,
+    vehicle,
+    extras: availExtras,
+    extrasPerDay,
+    baseRate,
+    totalDays,
+    totalPrice,
+    plate,
+    status,
+    bookedOn,
+  };
+}
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let currentBooking = null;
+let modState = {
+  selectedCategory: null,
+  selectedVehicle: null,
+  selectedExtras: [],
+};
+
+// ══════════════════════════════════════
+// SECTION MANAGEMENT
+// ══════════════════════════════════════
+function showSection(id) {
+  document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById('section-'+id);
+  if(el) { el.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+}
+
+function startNewBooking() {
+  currentBooking = null;
+  modState = { selectedCategory:null, selectedVehicle:null, selectedExtras:[] };
+  ['inputBookingId','inputEmail','inputPassword'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  clearErrors();
+  showSection('lookup');
+}
+
+function goBack(to) { showSection(to); }
+
+// ══════════════════════════════════════
+// VALIDATION HELPERS
+// ══════════════════════════════════════
+function clearErrors() {
+  document.querySelectorAll('.form-error').forEach(e=>e.classList.remove('visible'));
+  document.querySelectorAll('.form-input').forEach(e=>e.classList.remove('error'));
+}
+
+function showError(inputId, errId, msg) {
+  const inp = document.getElementById(inputId);
+  const err = document.getElementById(errId);
+  if(inp) inp.classList.add('error');
+  if(err) { err.textContent = '⚠ ' + msg; err.classList.add('visible'); }
+}
+
+function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+// ══════════════════════════════════════
+// STEP 1: VERIFY BOOKING
+// ══════════════════════════════════════
+function verifyBooking() {
+  clearErrors();
+  const bookingId = document.getElementById('inputBookingId').value.trim();
+  const email = document.getElementById('inputEmail').value.trim();
+  const password = document.getElementById('inputPassword').value;
+  let valid = true;
+
+  if(!bookingId) { showError('inputBookingId','err-bookingId','Please enter your booking ID'); valid=false; }
+  if(!email) { showError('inputEmail','err-email','Please enter your email address'); valid=false; }
+  else if(!isValidEmail(email)) { showError('inputEmail','err-email','Please enter a valid email address'); valid=false; }
+  if(!password) { showError('inputPassword','err-password','Please enter your password'); valid=false; }
+  else if(password.length < 6) { showError('inputPassword','err-password','Password must be at least 6 characters'); valid=false; }
+
+  if(!valid) return;
+
+  showLoading('Verifying your booking...');
+  setTimeout(()=>{
+    hideLoading();
+    currentBooking = generateBooking(bookingId, email);
+    renderDetails();
+    showSection('details');
+    showToast('✅', 'Booking verified successfully');
+  }, 1200);
+}
+
+// ══════════════════════════════════════
+// STEP 2: RENDER BOOKING DETAILS
+// ══════════════════════════════════════
+function renderDetails() {
+  const b = currentBooking;
+  document.getElementById('details-booking-id').textContent = `Booking #${b.bookingId}`;
+  document.getElementById('details-booked-on').textContent = `Booked on ${formatDate(b.bookedOn)}`;
+  document.getElementById('details-status-badge').innerHTML = statusBadge(b.status);
+
+  document.getElementById('d-name').textContent = b.customerName;
+  document.getElementById('d-phone').textContent = b.phone;
+  document.getElementById('d-email').textContent = b.email;
+  document.getElementById('d-category').textContent = b.categoryLabel;
+  document.getElementById('d-model').textContent = b.vehicle.model;
+  document.getElementById('d-plate').textContent = b.plate;
+  document.getElementById('d-extras').textContent = b.extras.length ? b.extras.map(e=>e.name).join(', ') : 'None';
+
+  document.getElementById('d-pickup-dt').textContent  = `${formatDate(b.pickupDate)} at ${formatTime(b.pickupDate)}`;
+  document.getElementById('d-dropoff-dt').textContent = `${formatDate(b.dropoffDate)} at ${formatTime(b.dropoffDate)}`;
+  document.getElementById('d-pickup-loc').textContent  = b.pickupLoc.name;
+  document.getElementById('d-dropoff-loc').textContent = b.dropoffLoc.name;
+  document.getElementById('d-duration').textContent = `${b.totalDays} day${b.totalDays!==1?'s':''}`;
+  document.getElementById('d-base-rate').textContent = `$${b.baseRate}/day`;
+  document.getElementById('d-extras-rate').textContent = `$${b.extrasPerDay}/day`;
+  document.getElementById('d-total').textContent = `$${b.totalPrice.toFixed(2)}`;
+
+  // Check modification eligibility
+  const modCheck = checkModEligibility(b);
+  const alertBox = document.getElementById('details-status-alert');
+  const blockedSection = document.getElementById('blocked-section');
+  const btnModify = document.getElementById('btnModifyBooking');
+
+  alertBox.innerHTML = '';
+  blockedSection.style.display = 'none';
+  btnModify.style.display = 'inline-flex';
+
+  if(modCheck.blocked) {
+    btnModify.style.display = 'none';
+    blockedSection.style.display = 'block';
+    document.getElementById('blocked-icon').textContent = modCheck.icon;
+    document.getElementById('blocked-title').textContent = modCheck.title;
+    document.getElementById('blocked-text').textContent = modCheck.reason;
+    alertBox.innerHTML = `<div class="alert alert-danger fade-in"><div class="alert-icon">${modCheck.icon}</div><div><div class="alert-title">${modCheck.title}</div><div>${modCheck.reason}</div></div></div>`;
+  } else if(modCheck.warn) {
+    alertBox.innerHTML = `<div class="alert alert-warning fade-in"><div class="alert-icon">⚠️</div><div><div class="alert-title">${modCheck.title}</div><div>${modCheck.reason}</div></div></div>`;
+  } else if(modCheck.info) {
+    alertBox.innerHTML = `<div class="alert alert-info fade-in"><div class="alert-icon">ℹ️</div><div><div class="alert-title">${modCheck.title}</div><div>${modCheck.reason}</div></div></div>`;
+  }
+}
+
+function checkModEligibility(b) {
+  const now = new Date();
+  const hoursToPickup = (b.pickupDate - now) / 3600000;
+
+  if(b.status === 'completed') return { blocked:true, icon:'✅', title:'Booking Completed', reason:'This rental has already been completed and cannot be modified.' };
+  if(b.status === 'cancelled') return { blocked:true, icon:'❌', title:'Booking Cancelled', reason:'This booking has been cancelled. No modifications are possible.' };
+  if(hoursToPickup < 0) return { blocked:true, icon:'🕐', title:'Rental In Progress or Past', reason:'This rental has already started or the pickup time has passed.' };
+  if(hoursToPickup < 2) return { blocked:true, icon:'⏰', title:'Too Close to Pickup', reason:`Pickup is in less than 2 hours (${hoursToPickup.toFixed(1)}h). Modifications must be made at least 2 hours before pickup.` };
+  if(b.status === 'active') return { info:true, icon:'⚡', title:'Active Booking', reason:'Modifications to active bookings will be escalated to our Customer Support team for approval.' };
+  if(hoursToPickup < 24) return { warn:true, icon:'⚠️', title:'Less than 24 Hours to Pickup', reason:`A $50 modification fee applies. Pickup is in ${hoursToPickup.toFixed(1)} hours.` };
+  if(hoursToPickup < 48) return { warn:true, title:'48-Hour Window', reason:`A $25 modification fee applies. Pickup is in ${hoursToPickup.toFixed(1)} hours.` };
+  return { ok:true };
+}
+
+function getModFee(b) {
+  const now = new Date();
+  const h = (b.pickupDate - now) / 3600000;
+  if(h >= 48) return 0;
+  if(h >= 24) return 25;
+  return 50;
+}
+
+// ══════════════════════════════════════
+// STEP 3: MODIFY
+// ══════════════════════════════════════
+function goToModify() {
+  const b = currentBooking;
+  modState.selectedCategory = b.category;
+  modState.selectedVehicle  = b.vehicle;
+  modState.selectedExtras   = [...b.extras.map(e=>e.id)];
+
+  // Fill form
+  document.getElementById('mod-booking-id').textContent    = b.bookingId;
+  document.getElementById('mod-customer-name').textContent = b.customerName;
+  document.getElementById('mod-status-badge').innerHTML    = statusBadge(b.status);
+  document.getElementById('mod-name').value   = b.customerName;
+  document.getElementById('mod-phone').value  = b.phone;
+  document.getElementById('mod-email').value  = b.email;
+
+  document.getElementById('mod-pickup-date').value  = toDateInput(b.pickupDate);
+  document.getElementById('mod-pickup-time').value  = toTimeInput(b.pickupDate);
+  document.getElementById('mod-dropoff-date').value = toDateInput(b.dropoffDate);
+  document.getElementById('mod-dropoff-time').value = toTimeInput(b.dropoffDate);
+
+  // Locations
+  buildLocationSelect('mod-pickup-loc',  b.pickupLoc.id);
+  buildLocationSelect('mod-dropoff-loc', b.dropoffLoc.id);
+
+  // Categories
+  buildCategories();
+  buildVehicleCards(b.category);
+
+  // Extras
+  buildExtras();
+
+  // Escalate notice
+  document.getElementById('escalate-notice').style.display = b.status==='active' ? 'block' : 'none';
+
+  // Fee notice
+  const fee = getModFee(b);
+  const feeNotice = document.getElementById('mod-fee-notice');
+  if(fee > 0) {
+    feeNotice.style.display = 'flex';
+    feeNotice.className = 'alert alert-warning';
+    feeNotice.innerHTML = `<div class="alert-icon">💳</div><div><div class="alert-title">Modification Fee: $${fee}</div>A $${fee} fee applies as pickup is ${fee===50?'less than 24 hours':'24–48 hours'} away.</div>`;
+  } else {
+    feeNotice.style.display = 'none';
+  }
+
+  updatePricing();
+  showSection('modify');
+}
+
+function buildLocationSelect(selectId, selected) {
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = '';
+  LOCATIONS.forEach(loc => {
+    const opt = document.createElement('option');
+    opt.value = loc.id;
+    opt.textContent = loc.available ? loc.name : `${loc.name} (Unavailable)`;
+    opt.dataset.unavailable = !loc.available;
+    if(!loc.available) opt.style.color = '#aaa';
+    if(loc.id === selected) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function validateLocation(which) {
+  const selId = `mod-${which}-loc`;
+  const errId = `err-${which}-loc`;
+  const sel = document.getElementById(selId);
+  const locId = sel.value;
+  const loc = LOCATIONS.find(l=>l.id===locId);
+  const err = document.getElementById(errId);
+  if(!loc.available) {
+    sel.classList.add('error');
+    err.classList.add('visible');
+    err.textContent = `⚠ ${loc.name} is currently unavailable. Please choose another location.`;
+  } else {
+    sel.classList.remove('error');
+    err.classList.remove('visible');
+  }
+}
+
+function buildCategories() {
+  const grid = document.getElementById('category-grid');
+  grid.innerHTML = '';
+  Object.entries(CATEGORIES).forEach(([key,cat])=>{
+    const div = document.createElement('div');
+    div.className = 'category-card' + (modState.selectedCategory===key ? ' selected' : '');
+    div.onclick = ()=>selectCategory(key);
+    div.innerHTML = `<div class="category-card-icon">${cat.icon}</div><div class="category-card-name">${cat.label}</div><div class="category-card-rate">$${cat.rate}/day</div>`;
+    grid.appendChild(div);
+  });
+}
+
+function selectCategory(key) {
+  modState.selectedCategory = key;
+  // Reset vehicle if category changed
+  if(modState.selectedVehicle && modState.selectedVehicle.id.substring(0,3).toLowerCase() !== key.substring(0,3).toLowerCase()) {
+    modState.selectedVehicle = null;
+  }
+  buildCategories();
+  buildVehicleCards(key);
+  updatePricing();
+}
+
+function buildVehicleCards(catKey) {
+  const section = document.getElementById('vehicle-selection-section');
+  const grid = document.getElementById('vehicle-cards-grid');
+  section.style.display = 'block';
+  grid.innerHTML = '';
+  VEHICLES[catKey].forEach(v=>{
+    const isSelected = modState.selectedVehicle && modState.selectedVehicle.id === v.id;
+    const div = document.createElement('div');
+    div.className = `vehicle-card${isSelected?' selected':''}${!v.available?' unavailable':''}`;
+    if(v.available) div.onclick = ()=>selectVehicle(v, catKey);
+    div.innerHTML = `
+      <div class="vehicle-card-badge ${v.available?'avail-badge':'unavail-badge'}">${v.available?'Available':'Unavailable'}</div>
+      <div class="vehicle-card-name">${v.model}</div>
+      <div class="vehicle-card-id">${v.id} · ${v.color}</div>
+      <div class="vehicle-specs">
+        <span class="spec-pill">${v.trans}</span>
+        <span class="spec-pill">${v.fuel}</span>
+        <span class="spec-pill">${v.seats} seats</span>
+      </div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function selectVehicle(v, catKey) {
+  modState.selectedVehicle = v;
+  buildVehicleCards(catKey);
+  updatePricing();
+}
+
+function buildExtras() {
+  const grid = document.getElementById('extras-grid');
+  grid.innerHTML = '';
+  EXTRAS.forEach(ex=>{
+    const isSelected = modState.selectedExtras.includes(ex.id);
+    const div = document.createElement('div');
+    div.className = `extra-card${isSelected?' selected':''}`;
+    div.onclick = ()=>toggleExtra(ex.id);
+    div.innerHTML = `
+      <div class="extra-check">${isSelected?'✓':''}</div>
+      <div class="extra-info">
+        <div class="extra-name">${ex.icon} ${ex.name}</div>
+        <div class="extra-price">$${ex.price}/day</div>
+      </div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function toggleExtra(id) {
+  const idx = modState.selectedExtras.indexOf(id);
+  if(idx>-1) modState.selectedExtras.splice(idx,1);
+  else modState.selectedExtras.push(id);
+  buildExtras();
+  updatePricing();
+}
+
+function updatePricing() {
+  const b = currentBooking;
+  if(!b) return;
+
+  const pickupDate  = getInputDate('mod-pickup-date','mod-pickup-time');
+  const dropoffDate = getInputDate('mod-dropoff-date','mod-dropoff-time');
+  const days = Math.max(1, Math.round((dropoffDate - pickupDate) / 86400000));
+  const catKey = modState.selectedCategory || b.category;
+  const baseRate = CATEGORIES[catKey].rate;
+  const extrasPerDay = modState.selectedExtras.reduce((s,id)=>{ const ex=EXTRAS.find(e=>e.id===id); return s+(ex?ex.price:0); }, 0);
+  const modFee = getModFee(b);
+  const newTotal = (baseRate + extrasPerDay) * days + modFee;
+  const diff = newTotal - b.totalPrice;
+
+  document.getElementById('pr-original').textContent = `$${b.totalPrice.toFixed(2)}`;
+  document.getElementById('pr-base-label').textContent = `Base (${CATEGORIES[catKey].label})`;
+  document.getElementById('pr-base').textContent = `$${baseRate}/day`;
+  document.getElementById('pr-days-label').textContent = 'Duration';
+  document.getElementById('pr-days').textContent = `${days} day${days!==1?'s':''}`;
+  document.getElementById('pr-extras').textContent = `$${extrasPerDay}/day`;
+  document.getElementById('pr-modfee').textContent = `$${modFee.toFixed(2)}`;
+  document.getElementById('pr-total').textContent = `$${newTotal.toFixed(2)}`;
+  document.getElementById('pr-diff-label').textContent = diff >= 0 ? 'Extra Payment' : 'Refund';
+  const diffEl = document.getElementById('pr-diff');
+  diffEl.textContent = `${diff>=0?'+':''}$${Math.abs(diff).toFixed(2)}`;
+  diffEl.parentElement.className = `pricing-row ${diff>0?'diff-positive':'diff-negative'}`;
+
+  updateChangeSummary(b, days, baseRate, extrasPerDay, modFee, newTotal);
+}
+
+function updateChangeSummary(b, days, baseRate, extrasPerDay, modFee, newTotal) {
+  const changes = [];
+  const pickupDate  = getInputDate('mod-pickup-date','mod-pickup-time');
+  const dropoffDate = getInputDate('mod-dropoff-date','mod-dropoff-time');
+
+  if(toDateInput(pickupDate) !== toDateInput(b.pickupDate) || toTimeInput(pickupDate) !== toTimeInput(b.pickupDate))
+    changes.push({label:'Pickup', from:`${formatDate(b.pickupDate)} ${formatTime(b.pickupDate)}`, to:`${formatDate(pickupDate)} ${formatTime(pickupDate)}`});
+  if(toDateInput(dropoffDate) !== toDateInput(b.dropoffDate) || toTimeInput(dropoffDate) !== toTimeInput(b.dropoffDate))
+    changes.push({label:'Dropoff', from:`${formatDate(b.dropoffDate)} ${formatTime(b.dropoffDate)}`, to:`${formatDate(dropoffDate)} ${formatTime(dropoffDate)}`});
+
+  const pickLocId  = document.getElementById('mod-pickup-loc').value;
+  const dropLocId  = document.getElementById('mod-dropoff-loc').value;
+  if(pickLocId !== b.pickupLoc.id) changes.push({label:'Pickup Loc', from:b.pickupLoc.name, to:LOCATIONS.find(l=>l.id===pickLocId)?.name});
+  if(dropLocId !== b.dropoffLoc.id) changes.push({label:'Dropoff Loc', from:b.dropoffLoc.name, to:LOCATIONS.find(l=>l.id===dropLocId)?.name});
+
+  if(modState.selectedCategory !== b.category) changes.push({label:'Category', from:b.categoryLabel, to:CATEGORIES[modState.selectedCategory].label});
+  if(modState.selectedVehicle && modState.selectedVehicle.id !== b.vehicle.id) changes.push({label:'Vehicle', from:b.vehicle.model, to:modState.selectedVehicle.model});
+
+  const oldExtIds = b.extras.map(e=>e.id).sort().join();
+  const newExtIds = [...modState.selectedExtras].sort().join();
+  if(oldExtIds !== newExtIds) {
+    const added = modState.selectedExtras.filter(id=>!b.extras.find(e=>e.id===id)).map(id=>EXTRAS.find(e=>e.id===id)?.name);
+    const removed = b.extras.filter(e=>!modState.selectedExtras.includes(e.id)).map(e=>e.name);
+    if(added.length) changes.push({label:'Added', from:'—', to:added.join(', ')});
+    if(removed.length) changes.push({label:'Removed', from:removed.join(', '), to:'—'});
+  }
+
+  const card = document.getElementById('change-summary-card');
+  const list = document.getElementById('change-summary-list');
+  if(changes.length === 0) { card.style.display='none'; return; }
+  card.style.display = 'block';
+  list.innerHTML = changes.map(c=>`
+    <div class="change-row">
+      <div class="change-label">${c.label}</div>
+      <div style="flex:1;">
+        <div class="change-from">${c.from}</div>
+        <div class="change-arrow">↓</div>
+        <div class="change-to">${c.to}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════
+// SUBMIT MODIFICATION
+// ══════════════════════════════════════
+function submitModification() {
+  const b = currentBooking;
+  // Validate
+  clearErrors();
+  let valid = true;
+
+  const email = document.getElementById('mod-email').value.trim();
+  if(!isValidEmail(email)) { showError('mod-email','err-mod-email','Please enter a valid email address'); valid=false; }
+
+  // Check locations
+  ['pickup','dropoff'].forEach(w=>{
+    const locId = document.getElementById(`mod-${w}-loc`).value;
+    const loc = LOCATIONS.find(l=>l.id===locId);
+    if(!loc.available) {
+      showError(`mod-${w}-loc`, `err-${w}-loc`, `${loc.name} is unavailable`);
+      valid=false;
+    }
+  });
+
+  // Check vehicle selected
+  if(!modState.selectedVehicle) { showToast('⚠️', 'Please select a vehicle to continue'); valid=false; }
+  if(!modState.selectedVehicle?.available) { showToast('❌', 'Selected vehicle is unavailable'); valid=false; }
+
+  if(!valid) return;
+
+  showLoading('Processing modification request...');
+
+  setTimeout(()=>{
+    hideLoading();
+    const pickupDate  = getInputDate('mod-pickup-date','mod-pickup-time');
+    const dropoffDate = getInputDate('mod-dropoff-date','mod-dropoff-time');
+    const days = Math.max(1, Math.round((dropoffDate - pickupDate) / 86400000));
+    const catKey = modState.selectedCategory;
+    const baseRate = CATEGORIES[catKey].rate;
+    const extrasPerDay = modState.selectedExtras.reduce((s,id)=>{ const ex=EXTRAS.find(e=>e.id===id); return s+(ex?ex.price:0); }, 0);
+    const modFee = getModFee(b);
+    const newTotal = (baseRate + extrasPerDay) * days + modFee;
+    const diff = newTotal - b.totalPrice;
+    const newExtras = modState.selectedExtras.map(id=>EXTRAS.find(e=>e.id===id)).filter(Boolean);
+
+    const updatedBooking = {
+      ...b,
+      customerName: document.getElementById('mod-name').value.trim(),
+      phone: document.getElementById('mod-phone').value.trim(),
+      email,
+      pickupDate, dropoffDate,
+      pickupLoc:  LOCATIONS.find(l=>l.id===document.getElementById('mod-pickup-loc').value),
+      dropoffLoc: LOCATIONS.find(l=>l.id===document.getElementById('mod-dropoff-loc').value),
+      category: catKey,
+      categoryLabel: CATEGORIES[catKey].label,
+      vehicle: modState.selectedVehicle,
+      extras: newExtras, extrasPerDay,
+      baseRate, totalDays: days,
+      totalPrice: newTotal,
+      modFee, diff,
+      modifiedAt: new Date(),
+    };
+
+    const result = approvalEngine(b, updatedBooking);
+    renderResult(b, updatedBooking, result, modFee, diff);
+    showSection('result');
+  }, 2000);
+}
+
+// ══════════════════════════════════════
+// APPROVAL ENGINE
+// ══════════════════════════════════════
+function approvalEngine(original, updated) {
+  if(original.status === 'active') return { outcome:'escalate', reason:'Active booking modifications require Customer Support Agent approval.' };
+  if(!updated.vehicle.available) return { outcome:'reject', reason:'Selected vehicle is no longer available.' };
+  const pickLoc = LOCATIONS.find(l=>l.id===updated.pickupLoc.id);
+  const dropLoc = LOCATIONS.find(l=>l.id===updated.dropoffLoc.id);
+  if(!pickLoc.available) return { outcome:'reject', reason:`${pickLoc.name} is currently unavailable for pickup.` };
+  if(!dropLoc.available) return { outcome:'reject', reason:`${dropLoc.name} is currently unavailable for dropoff.` };
+  if(Math.abs(updated.diff) > 500) return { outcome:'escalate', reason:'Large price change (>$500) requires Customer Support review.' };
+  return { outcome:'approve', reason:'All checks passed. Modification approved.' };
+}
+
+// ══════════════════════════════════════
+// RENDER RESULT
+// ══════════════════════════════════════
+function renderResult(original, updated, result, modFee, diff) {
+  const card = document.getElementById('result-card');
+  const icons = { approve:'✅', reject:'❌', escalate:'⚡' };
+  const titles = { approve:'Modification Approved!', reject:'Modification Rejected', escalate:'Escalated to Support' };
+  const colors = { approve:'success', reject:'danger', escalate:'escalate' };
+  const desc = {
+    approve: `Your booking has been successfully updated. ${diff>0?`An additional payment of $${diff.toFixed(2)} is required.`:`A refund of $${Math.abs(diff).toFixed(2)} will be initiated.`}`,
+    reject:  `We couldn't process this modification. ${result.reason}`,
+    escalate:`Your request has been forwarded to a Customer Support Agent. Ref: ${updated.bookingId}-MOD-${Date.now().toString(36).toUpperCase()}. You'll receive an email at ${updated.email} within 2-4 hours.`,
+  };
+
+  const notifMap = {
+    approve: diff>0
+      ? '<div class="alert alert-warning mb-2"><div class="alert-icon">💳</div><div><div class="alert-title">Payment Required</div>Additional charge of $'+diff.toFixed(2)+' will be processed to your card on file.</div></div>'
+      : '<div class="alert alert-success mb-2"><div class="alert-icon">💚</div><div><div class="alert-title">Refund Initiated</div>$'+Math.abs(diff).toFixed(2)+' refund will appear in 3–5 business days.</div></div>',
+    reject:  '<div class="alert alert-danger mb-2"><div class="alert-icon">❌</div><div><div class="alert-title">Request Rejected</div>'+result.reason+'</div></div>',
+    escalate:'<div class="alert alert-escalate mb-2"><div class="alert-icon">⚡</div><div><div class="alert-title">Support Team Notified</div>A support agent will review and contact you within 2–4 hours.</div></div>',
+  };
+
+  const showReceipt = result.outcome === 'approve';
+
+  card.innerHTML = `
+    <div class="result-screen fade-in">
+      <div class="result-icon ${colors[result.outcome]}">${icons[result.outcome]}</div>
+      <h2 class="result-title">${titles[result.outcome]}</h2>
+      <p class="result-sub">${desc[result.outcome]}</p>
+      ${notifMap[result.outcome]}
+    </div>
+    <div class="card-body" style="border-top:1px solid var(--border);">
+      <div class="section-title">Booking Summary</div>
+      <div class="booking-detail-grid mb-2">
+        <div class="detail-cell"><div class="detail-label">Booking ID</div><div class="detail-value">${updated.bookingId}</div></div>
+        <div class="detail-cell"><div class="detail-label">Status</div><div class="detail-value">${statusBadge(original.status)}</div></div>
+        <div class="detail-cell"><div class="detail-label">Customer</div><div class="detail-value">${updated.customerName}</div></div>
+        <div class="detail-cell"><div class="detail-label">Vehicle</div><div class="detail-value">${updated.vehicle.model}</div></div>
+        <div class="detail-cell"><div class="detail-label">Pickup</div><div class="detail-value">${formatDate(updated.pickupDate)} ${formatTime(updated.pickupDate)}</div></div>
+        <div class="detail-cell"><div class="detail-label">Dropoff</div><div class="detail-value">${formatDate(updated.dropoffDate)} ${formatTime(updated.dropoffDate)}</div></div>
+        <div class="detail-cell"><div class="detail-label">Pickup Loc</div><div class="detail-value">${updated.pickupLoc.name}</div></div>
+        <div class="detail-cell"><div class="detail-label">Dropoff Loc</div><div class="detail-value">${updated.dropoffLoc.name}</div></div>
+        <div class="detail-cell full-width" style="background:var(--accent-light);">
+          <div class="detail-label">New Total</div>
+          <div class="detail-value accent-text font-bold" style="font-size:1.2rem;">$${updated.totalPrice.toFixed(2)}</div>
+        </div>
+      </div>
+      ${showReceipt ? `
+      <div class="receipt-actions mt-2">
+        <button class="btn btn-accent" onclick="downloadReceipt()">⬇ Download Receipt</button>
+        <button class="btn btn-outline" onclick="startNewBooking()">Manage Another Booking</button>
+      </div>` : `
+      <div class="receipt-actions mt-2">
+        <button class="btn btn-outline" onclick="showSection('modify')">← Back to Modification</button>
+        <button class="btn btn-outline" onclick="startNewBooking()">Manage Another Booking</button>
+      </div>`}
+    </div>
+  `;
+
+  // store for receipt generation
+  window._receiptData = { original, updated, result, modFee, diff };
+}
+
+// ══════════════════════════════════════
+// FINAL RECEIPT (no-mod view)
+// ══════════════════════════════════════
+function goToFinalReceipt(blocked) {
+  const b = currentBooking;
+  const card = document.getElementById('result-card');
+  card.innerHTML = `
+    <div class="result-screen fade-in">
+      <div class="result-icon success">📄</div>
+      <h2 class="result-title">Booking Details</h2>
+      <p class="result-sub">This booking cannot be modified. Here are your confirmed booking details.</p>
+      <div class="alert alert-info mb-2" style="text-align:left;">
+        <div class="alert-icon">ℹ️</div>
+        <div><div class="alert-title">No Changes Made</div>Your original booking is intact.</div>
+      </div>
+    </div>
+    <div class="card-body" style="border-top:1px solid var(--border);">
+      <div class="section-title">Your Booking</div>
+      <div class="booking-detail-grid mb-2">
+        <div class="detail-cell"><div class="detail-label">Booking ID</div><div class="detail-value">${b.bookingId}</div></div>
+        <div class="detail-cell"><div class="detail-label">Status</div><div class="detail-value">${statusBadge(b.status)}</div></div>
+        <div class="detail-cell"><div class="detail-label">Customer</div><div class="detail-value">${b.customerName}</div></div>
+        <div class="detail-cell"><div class="detail-label">Vehicle</div><div class="detail-value">${b.vehicle.model}</div></div>
+        <div class="detail-cell"><div class="detail-label">Pickup</div><div class="detail-value">${formatDate(b.pickupDate)} ${formatTime(b.pickupDate)}</div></div>
+        <div class="detail-cell"><div class="detail-label">Dropoff</div><div class="detail-value">${formatDate(b.dropoffDate)} ${formatTime(b.dropoffDate)}</div></div>
+        <div class="detail-cell"><div class="detail-label">Pickup Location</div><div class="detail-value">${b.pickupLoc.name}</div></div>
+        <div class="detail-cell"><div class="detail-label">Dropoff Location</div><div class="detail-value">${b.dropoffLoc.name}</div></div>
+        <div class="detail-cell full-width" style="background:var(--accent-light);">
+          <div class="detail-label">Total Price</div>
+          <div class="detail-value accent-text font-bold" style="font-size:1.2rem;">$${b.totalPrice.toFixed(2)}</div>
+        </div>
+      </div>
+      <div class="receipt-actions mt-2">
+        <button class="btn btn-accent" onclick="downloadOriginalReceipt()">⬇ Download Receipt</button>
+        <button class="btn btn-outline" onclick="startNewBooking()">Manage Another Booking</button>
+      </div>
+    </div>
+  `;
+  window._receiptData = { original: b, updated: b, result:{outcome:'none'}, modFee:0, diff:0 };
+  showSection('result');
+}
+
+// ══════════════════════════════════════
+// RECEIPT DOWNLOAD
+// ══════════════════════════════════════
+function buildReceiptHTML(original, updated, result, modFee, diff) {
+  const ts = new Date().toLocaleString();
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DriveEase Receipt — ${updated.bookingId}</title>
+<style>
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f0;margin:0;padding:2rem;}
+.receipt{max-width:700px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.1);}
+.receipt-header{background:#0A0A0A;color:#fff;padding:2rem;display:flex;justify-content:space-between;align-items:center;}
+.receipt-brand{font-size:1.5rem;font-weight:800;color:#C8A96E;}
+.receipt-id{font-size:0.9rem;color:rgba(255,255,255,0.6);}
+.receipt-body{padding:2rem;}
+.section-heading{font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:#999;margin:1.5rem 0 0.75rem;border-bottom:1px solid #eee;padding-bottom:6px;}
+.row{display:flex;justify-content:space-between;padding:6px 0;font-size:0.9rem;border-bottom:1px solid #f5f5f5;}
+.row:last-child{border-bottom:none;}
+.label{color:#666;}
+.value{font-weight:500;text-align:right;}
+.total-row{display:flex;justify-content:space-between;padding:12px 16px;background:#f5edd8;border-radius:8px;margin-top:1rem;}
+.total-label{font-weight:700;font-size:1rem;}
+.total-value{font-weight:700;font-size:1.2rem;color:#8B6F3E;}
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.75rem;font-weight:600;text-transform:uppercase;}
+.badge-confirmed{background:#dbeafe;color:#1A4A7A;}
+.badge-active{background:#d8f3dc;color:#2D6A4F;}
+.badge-completed{background:#f0ede8;color:#6B6560;}
+.badge-cancelled{background:#ffe4e4;color:#7B1D1D;}
+.footer{padding:1.5rem 2rem;background:#f8f7f5;text-align:center;font-size:0.8rem;color:#999;border-top:1px solid #eee;}
+</style>
+</head>
+<body>
+<div class="receipt">
+  <div class="receipt-header">
+    <div class="receipt-brand">DriveEase</div>
+    <div>
+      <div style="font-size:1rem;font-weight:700;">${result.outcome==='approve'?'Modified ':result.outcome==='none'?'':''}Booking Receipt</div>
+      <div class="receipt-id">Generated: ${ts}</div>
+    </div>
+  </div>
+  <div class="receipt-body">
+    <div class="section-heading">Booking Information</div>
+    <div class="row"><span class="label">Booking ID</span><span class="value">${updated.bookingId}</span></div>
+    <div class="row"><span class="label">Status</span><span class="value"><span class="badge badge-${original.status}">${original.status}</span></span></div>
+    <div class="row"><span class="label">Outcome</span><span class="value">${result.outcome==='approve'?'Modification Approved':result.outcome==='escalate'?'Escalated to Support':result.outcome==='reject'?'Modification Rejected':'Original Booking'}</span></div>
+
+    <div class="section-heading">Customer Details</div>
+    <div class="row"><span class="label">Name</span><span class="value">${updated.customerName}</span></div>
+    <div class="row"><span class="label">Email</span><span class="value">${updated.email}</span></div>
+    <div class="row"><span class="label">Phone</span><span class="value">${updated.phone}</span></div>
+
+    <div class="section-heading">Original Booking</div>
+    <div class="row"><span class="label">Vehicle</span><span class="value">${original.vehicle.model} (${original.categoryLabel})</span></div>
+    <div class="row"><span class="label">Plate</span><span class="value">${original.plate}</span></div>
+    <div class="row"><span class="label">Pickup</span><span class="value">${formatDate(original.pickupDate)} ${formatTime(original.pickupDate)}</span></div>
+    <div class="row"><span class="label">Dropoff</span><span class="value">${formatDate(original.dropoffDate)} ${formatTime(original.dropoffDate)}</span></div>
+    <div class="row"><span class="label">Pickup Loc</span><span class="value">${original.pickupLoc.name}</span></div>
+    <div class="row"><span class="label">Dropoff Loc</span><span class="value">${original.dropoffLoc.name}</span></div>
+    <div class="row"><span class="label">Extras</span><span class="value">${original.extras.length?original.extras.map(e=>e.name).join(', '):'None'}</span></div>
+    <div class="row"><span class="label">Original Total</span><span class="value">$${original.totalPrice.toFixed(2)}</span></div>
+
+    ${result.outcome==='approve'?`
+    <div class="section-heading">Updated Booking</div>
+    <div class="row"><span class="label">Vehicle</span><span class="value">${updated.vehicle.model} (${updated.categoryLabel})</span></div>
+    <div class="row"><span class="label">Pickup</span><span class="value">${formatDate(updated.pickupDate)} ${formatTime(updated.pickupDate)}</span></div>
+    <div class="row"><span class="label">Dropoff</span><span class="value">${formatDate(updated.dropoffDate)} ${formatTime(updated.dropoffDate)}</span></div>
+    <div class="row"><span class="label">Pickup Loc</span><span class="value">${updated.pickupLoc.name}</span></div>
+    <div class="row"><span class="label">Dropoff Loc</span><span class="value">${updated.dropoffLoc.name}</span></div>
+    <div class="row"><span class="label">Extras</span><span class="value">${updated.extras.length?updated.extras.map(e=>e.name).join(', '):'None'}</span></div>
+    `:''}
+
+    <div class="section-heading">Pricing</div>
+    <div class="row"><span class="label">Base Rate</span><span class="value">$${updated.baseRate}/day × ${updated.totalDays} days</span></div>
+    <div class="row"><span class="label">Extras/Day</span><span class="value">$${updated.extrasPerDay}/day</span></div>
+    ${modFee>0?`<div class="row"><span class="label">Modification Fee</span><span class="value">$${modFee.toFixed(2)}</span></div>`:''}
+    ${result.outcome==='approve'&&diff!==0?`<div class="row"><span class="label">${diff>0?'Additional Charge':'Refund'}</span><span class="value">${diff>0?'+':'-'}$${Math.abs(diff).toFixed(2)}</span></div>`:''}
+    <div class="total-row">
+      <span class="total-label">Total Amount</span>
+      <span class="total-value">$${updated.totalPrice.toFixed(2)}</span>
+    </div>
+  </div>
+  <div class="footer">DriveEase Car Rental · Thank you for choosing us · support@driveease.com</div>
+</div>
+</body></html>`;
+}
+
+function downloadReceipt() {
+  const d = window._receiptData;
+  if(!d) return;
+  triggerDownload(buildReceiptHTML(d.original, d.updated, d.result, d.modFee, d.diff), `booking-${d.updated.bookingId}-receipt.html`);
+}
+
+function downloadOriginalReceipt() {
+  const b = currentBooking;
+  triggerDownload(buildReceiptHTML(b, b, {outcome:'none'}, 0, 0), `booking-${b.bookingId}-receipt.html`);
+}
+
+function triggerDownload(html, filename) {
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+  showToast('⬇️', 'Receipt downloaded!');
+}
+
+// ══════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════
+function statusBadge(s) {
+  return `<span class="badge badge-${s}">${s}</span>`;
+}
+
+function formatDate(d) {
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function formatTime(d) {
+  return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
+}
+
+function toDateInput(d) {
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function toTimeInput(d) {
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function getInputDate(dateId, timeId) {
+  const dv = document.getElementById(dateId).value;
+  const tv = document.getElementById(timeId).value || '10:00';
+  const [y,m,d] = dv.split('-').map(Number);
+  const [h,mn] = tv.split(':').map(Number);
+  return new Date(y,m-1,d,h,mn,0,0);
+}
+
+function showLoading(msg='Processing...') {
+  document.getElementById('loadingText').textContent = msg;
+  document.getElementById('loadingOverlay').classList.add('visible');
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('visible');
+}
+
+function showToast(icon, msg) {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(), 3500);
+}
+</script>
+</body>
+</html>
